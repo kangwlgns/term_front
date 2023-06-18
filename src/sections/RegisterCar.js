@@ -80,6 +80,8 @@ const RegisterCar = () => {
             alert("입력되지 않은 값이 있습니다");
         }else {
             if (carNumCheck(carNum) === true){
+                // 차량을 등록하고, 만약 차량이 이미 있는경우, 차량등록은 하지 않고, 랜트카만 등록한다
+                // 만약 렌트카의 번호가 이미 있다면 렌트카도 등록하지 않는다.
                 Swal.fire({
                     icon: 'warning',
                     title: '등록',
@@ -129,7 +131,7 @@ const RegisterCar = () => {
                     }
                 });
             } else{
-                alert("차량번호가 부적합합니다")
+                alert("차량번호가 부적합합니다");
             }
         }
     };

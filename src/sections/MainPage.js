@@ -25,12 +25,14 @@ function MainPage() {
     const firstCome = async () => {
       alert("로딩 중입니다.");
 
+      // 부적절한 접근인 경우 로그인 페이지로
       if (cno === -1) {
         alert("잘못된 접근입니다.");
         navigate("/login");
         return; 
       }
 
+      // 백엔드로 cno를 보내면 대여목록과 예약목록을 돌려받음.
       try {
         const res = await axios.post('http://localhost:3001/myRent', {cno: cno});
         setPrev(res.data.prev);
@@ -41,17 +43,19 @@ function MainPage() {
       }
     };
 
+    // 최초 렌더링 시에 최신화
     useEffect ( () => {
       firstCome();
     }, []);
     
+    // 예약을 취소하는 코드
     const cancelReservation = async (startd, plate) => {
       const url = 'http://localhost:3001/cancel';
       const data = { plateno: plate, start: startd, cno: cno };
 
+      // 차량 번호, 예약 시작일, cno를 주면 예약을 취소시켜줌.
       await axios.post(url, data)
           .then(res => {
-              alert(res.data.result)
               if (res.data.result === 'success') {
                   alert('예약을 취소하였습니다.');
                   firstCome();
@@ -65,14 +69,17 @@ function MainPage() {
           });
     };
 
+    // 차량을 반납하는 코드
     const returnCar = (plate) => {
       const url = 'http://localhost:3001/return';
       const data = { plateno: plate, cno: cno };
 
+      // 차량 번호와 cno를 넘겨주면 차량 반납
       axios.post(url, data)
         .then(res => {
           if (res.data.result === 'success') {
             alert('반납을 완료하였습니다.');
+            // 차량 목록 최신화 (previous rental로 이동)
             firstCome();
           } else {
             alert('반납을 완료하지 못했습니다.')
@@ -144,6 +151,7 @@ function MainPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* map으로 순회하면서 예약 테이블 채우기 */}
                     {
                       reser.map((v, i) => {
                           return (
@@ -167,6 +175,7 @@ function MainPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* map으로 순회하면서 대여 테이블 채우기 */}
                   {
                       rent.map((v, i) => {
                           return (
@@ -190,6 +199,7 @@ function MainPage() {
                     </tr>
                   </thead>
                   <tbody>
+                    {/* map으로 순회하면서 이전 대여 테이블 채우기 */}
                   {
                       prev.map((v, i) => {
                           return (

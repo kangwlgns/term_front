@@ -11,15 +11,20 @@ const Reservation = () => {
     const [availableCars, setAvailableCars] = useState([]);
     const cno = useRecoilValue(cnoNumber);
 
+    // 예약하는 코드
     const handleReservation = async (e) => {
+        // 새로고침 방지
         e.preventDefault();
         const url = 'http://localhost:3001/car';
         const data = {start: startDate, end: endDate};
 
+        // 시작날짜, 반납날짜를 백엔드에 전송
         await axios.post(url, data)
             .then(res => {
+                // 해당 날짜에 대여가 가능한 차량에 대해 받고 변수에 값 넘겨줌.
                 setAvailableCars(res.data.data);
 
+                // 만약 돌려받은 차량이 없는 경우 알림.
                 if (res.data.length == 0) {
                     alert("대여 가능한 차가 없습니다.");
                 }
@@ -30,6 +35,8 @@ const Reservation = () => {
             });
 
     };
+
+    // Select box에 사용할 차량 타입 
     const carTypes = [
         { value: 0, name: '전체' },
         { value: 1, name: '대형' },
@@ -40,12 +47,15 @@ const Reservation = () => {
         { value: 6, name: '고급' },
     ];
 
+    // select box 구현부분
     const SelectBox = (props) => {
         const handleSelectChange = (e) => {
+            // select box 누르면 예약 가능한 차량이 보여짐
             const selectedValue = e.target.value;
             setCarSelect(selectedValue);
         };
         return (
+            // 예약 가능한 차량 목록 순회하면서 보여주기
             <select value={carSelect} onChange={handleSelectChange}>
                 {props.options.map((option) => (
                     <option key={option.value} value={option.name}>
@@ -56,13 +66,11 @@ const Reservation = () => {
         );
     };
 
-    const [selectCarTypes, setSelectCarTypes] = useState(['차종을 선택']);
-
     const handleCarSelect = (selectedName) => {
         setCarSelect(selectedName);
     };
 
-
+    // select box에서 선택한 차량종류들만 보이도록 필터링
     const filteredCars = availableCars.filter(car => {
         if (carSelect === '전체') {
             return true;
@@ -70,7 +78,7 @@ const Reservation = () => {
             return car[2] === carSelect;
         }
     });
-
+    // 예약버튼 실행시 차량번호, 시작날짜, 끝날짜, 번호를 보내 예약하기
     const reservate = (props) => {
         Swal.fire({
             icon: 'warning',

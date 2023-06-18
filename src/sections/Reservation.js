@@ -11,13 +11,14 @@ const Reservation = () => {
     const [availableCars, setAvailableCars] = useState([]);
     const cno = useRecoilValue(cnoNumber);
 
-    const handleReservation = () => {
-        const url = 'localhost:3001/';
+    const handleReservation = async (e) => {
+        e.preventDefault();
+        const url = 'http://localhost:3001/car';
         const data = {start: startDate, end: endDate};
 
-        axios.post(url, data)
+        await axios.post(url, data)
             .then(res => {
-                setAvailableCars(res.data);
+                setAvailableCars(res.data.data);
 
                 if (res.data.length == 0) {
                     alert("대여 가능한 차가 없습니다.");
@@ -28,12 +29,6 @@ const Reservation = () => {
                 alert("ERROR!");
             });
 
-        // const dummyData = [
-        //     { id: 1, carNum: '44주4444', model: 'Sonata', type: 'SUV', fuel: 'LPG', seats: '4', price: '40000', option: '옵션' },
-        //     { id: 2, carNum: '44주4444', model: 'Sorento', type: '대형', fuel: 'LPG', seats: '4', price: '40000', option: '옵션' },
-        //     { id: 3, carNum: '44주4444', model: 'Camry', type: '소형', fuel: 'LPG', seats: '4', price: '40000', option: '옵션' },
-        // ];
-        // setAvailableCars(dummyData);
     };
     const carTypes = [
         { value: 0, name: '전체' },
@@ -66,29 +61,32 @@ const Reservation = () => {
     const handleCarSelect = (selectedName) => {
         setCarSelect(selectedName);
     };
+
+
     const filteredCars = availableCars.filter(car => {
         if (carSelect === '전체') {
             return true;
         } else {
-            return car.type === carSelect;
+            return car[2] === carSelect;
         }
     });
+
     const reservate = (props) => {
         Swal.fire({
             icon: 'warning',
             title: '예약',
-            text: `[${props.model}] ㄹㅇ 예약합??`,
+            text: `[${props[1]}] 예약하시겠습니까?`,
             showCancelButton: true,
             confirmButtonText: '예약',
             cancelButtonText: '취소',
         }).then((res) => {
             if (res.isConfirmed) {
-                const url = 'localhost:3001/'
+                const url = 'http://localhost:3001/reserve'
                 const data = {
+                    plateno: `${props[0]}`,
                     start: startDate,
                     end: endDate,
-                    cno: cno,
-                    plateno: `${props.carNum}`
+                    cno: cno
                 }
                 axios.post(url, data)
                     .then((res) => {
@@ -117,7 +115,7 @@ const Reservation = () => {
             {startDate > endDate ? (
                 <button disabled={true}> 날짜 부적합</button>
             ) : (
-                <button onClick={handleReservation}>검색하기</button>
+                <button onClick={handleReservation}>차량 목록 불러오기</button>
             )}
             {filteredCars.length > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'center',marginTop: '20px'}}>
@@ -137,13 +135,13 @@ const Reservation = () => {
                         <tbody>
                         {filteredCars.map((car) => (
                             <tr key={car.id}>
-                                <td style={{ padding: '0 10px' }}>{car.carNum}</td>
-                                <td style={{ padding: '0 10px' }}>{car.model}</td>
-                                <td style={{ padding: '0 10px' }}>{car.type}</td>
-                                <td style={{ padding: '0 10px' }}>{car.fuel}</td>
-                                <td style={{ padding: '0 10px' }}>{car.seats}</td>
-                                <td style={{ padding: '0 10px' }}>{car.price}</td>
-                                <td style={{ padding: '0 10px' }}>{car.option}</td>
+                                <td style={{ padding: '0 10px' }}>{car[0]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[1]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[2]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[3]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[4]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[5]}</td>
+                                <td style={{ padding: '0 10px' }}>{car[6]}</td>
                                 <td style={{ padding: '0 10px' }}>
                                     <button onClick={() => reservate(car)}>예약하기</button>
                                 </td>

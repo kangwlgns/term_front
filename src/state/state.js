@@ -2,5 +2,5 @@ import { atom } from "recoil";
 
 export const cnoNumber = atom({
     key: 'cnoNumber',
-    default : -1
+    default : 10004
 })

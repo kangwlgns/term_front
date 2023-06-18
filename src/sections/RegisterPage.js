@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {useNavigate} from "react-router-dom";
 import axios from 'axios';
 
@@ -21,38 +21,44 @@ function RegisterPage() {
         setConfirmPassword(event.currentTarget.value);
     }
     const navigate = useNavigate();
-    const navigateToLogin = () =>{
+    const navigateToLogin = () => {
         navigate("/login");
     };
 
-    const onSubmitHandler = () => {
+    const onSubmitHandler = async (e) => {
         if(password !== confirmpassword){
             return alert('비밀번호와 비밀번호 확인이 같지 않습니다.');
         }
+        e.preventDefault();
 
-        const url = 'localhost:3001/'
-        const data = {
+        const url = 'http://localhost:3001/signup';
+        const body = {
             email: email,
             name: name,
-            password: password,
-            confirmPassword: confirmpassword
-        }
+            password: password
+        };
 
-        axios.post(url, data)
-            .then (res => {
-                if (res.data.result === "success") {
-                    alert("회원가입이 완료되었습니다.")
-                    navigate("/login");
-                } else {
-                    alert("아이디 혹은 패스워드가 틀렸습니다.");
-                }
-            })
-            .catch (error => {
-                console.log(error);
-                alert("ERROR!");
-            });
+        await axios.post(url, body)
+        .then(function (res) {
+            if (res.data.result === "success") {
+                alert("회원가입이 완료되었습니다.");
+                navigateToLogin();
+            } else {
+                alert("이미 존재하는 ID거나 잘못된 email 형식입니다.");
+            }
+        })
+        .catch (function (error) {
+            console.log(error);
+            alert("ERROR!");
+        });
     }
-    
+
+    useEffect(() => {
+        setEmail(null);
+        setName(null);
+        setPassword(null);
+        setConfirmPassword(null);
+    }, []);
 
     return (
         <div style={{
